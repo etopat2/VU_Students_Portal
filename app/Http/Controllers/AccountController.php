@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
+use Devrabiul\ToastMagic\Facades\ToastMagic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -37,7 +38,13 @@ class AccountController extends Controller
                 Rule::unique('users', 'email')->ignore($user),
             ],
             'current_password' => ['nullable', 'required_with:password', 'current_password'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password' => [
+                Rule::requiredIf($user->must_change_password),
+                'nullable',
+                'string',
+                'min:8',
+                'confirmed',
+            ],
         ]);
 
         DB::transaction(function () use ($user, $validated): void {
@@ -46,6 +53,7 @@ class AccountController extends Controller
 
             if (! empty($validated['password'])) {
                 $user->password = $validated['password'];
+                $user->must_change_password = false;
             }
 
             $user->save();
@@ -55,9 +63,9 @@ class AccountController extends Controller
             ]);
         });
 
-        return redirect()
-            ->route('settings')
-            ->with('status', 'Your account details have been updated.');
+        ToastMagic::success('Your account details have been updated.');
+
+        return redirect()->route('settings');
     }
 
     private function respond(Request $request, string $view, string $title, array $data = []): View|Response

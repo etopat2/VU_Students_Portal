@@ -15,7 +15,7 @@ class AcademicPagesTest extends TestCase
 
     public function test_academic_pages_render_database_records_in_the_shared_layout(): void
     {
-        $this->actingAs(User::factory()->admin()->create());
+        $this->actingAs(User::factory()->create(['role' => 'registrar']));
         $this->createAcademicRecords();
 
         $pages = [
@@ -38,7 +38,7 @@ class AcademicPagesTest extends TestCase
 
     public function test_ajax_navigation_returns_academic_page_fragments_and_titles(): void
     {
-        $this->actingAs(User::factory()->admin()->create());
+        $this->actingAs(User::factory()->create(['role' => 'registrar']));
         $this->createAcademicRecords();
 
         $pages = [
@@ -62,7 +62,7 @@ class AcademicPagesTest extends TestCase
 
     public function test_academic_summary_cards_reflect_database_records(): void
     {
-        $this->actingAs(User::factory()->admin()->create());
+        $this->actingAs(User::factory()->create(['role' => 'registrar']));
         $this->createAcademicRecords();
 
         $this->get(route('students.index'))

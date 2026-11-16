@@ -11,9 +11,9 @@ class LecturersControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_create_a_lecturer_record(): void
+    public function test_registrar_can_create_a_lecturer_record(): void
     {
-        $this->actingAs(User::factory()->admin()->create())
+        $response = $this->actingAs(User::factory()->create(['role' => 'registrar']))
             ->post(route('lecturers.store'), [
                 'lecturer_number' => 'VU-LEC-001',
                 'name' => 'Alex Morgan',
@@ -22,8 +22,11 @@ class LecturersControllerTest extends TestCase
                 'qualification' => 'MSc Information Technology',
                 'phone' => '+256700000001',
                 'status' => 'Active',
-            ])
-            ->assertRedirect(route('lecturers.index'));
+            ]);
+
+        $response->assertRedirect(route('lecturers.index'));
+        $response->assertSessionHas('laravel-toaster-magic::messages', fn (array $messages): bool => $messages[0]['type'] === 'success'
+            && $messages[0]['message'] === 'Lecturer added successfully.');
 
         $this->assertDatabaseHas('lecturers', [
             'lecturer_number' => 'VU-LEC-001',
@@ -34,7 +37,7 @@ class LecturersControllerTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_edit_and_delete_a_lecturer(): void
+    public function test_registrar_can_edit_and_delete_a_lecturer(): void
     {
         $lecturer = Lecturer::create([
             'lecturer_number' => 'VU-LEC-001',
@@ -46,7 +49,7 @@ class LecturersControllerTest extends TestCase
             'status' => 'Active',
         ]);
 
-        $this->actingAs(User::factory()->admin()->create())
+        $this->actingAs(User::factory()->create(['role' => 'registrar']))
             ->put(route('lecturers.update', $lecturer), [
                 'lecturer_number' => 'VU-LEC-001',
                 'name' => 'Alex Morgan Updated',
@@ -73,7 +76,7 @@ class LecturersControllerTest extends TestCase
 
     public function test_lecturer_form_rejects_missing_required_fields(): void
     {
-        $this->actingAs(User::factory()->admin()->create())
+        $this->actingAs(User::factory()->create(['role' => 'registrar']))
             ->from(route('lecturers.create'))
             ->post(route('lecturers.store'), [])
             ->assertRedirect(route('lecturers.create'))
@@ -89,7 +92,7 @@ class LecturersControllerTest extends TestCase
         $this->assertDatabaseCount('lecturers', 0);
     }
 
-    public function test_admin_can_open_lecturer_directory_and_ajax_forms(): void
+    public function test_registrar_can_open_lecturer_directory_and_ajax_forms(): void
     {
         $lecturer = Lecturer::create([
             'lecturer_number' => 'VU-LEC-002',
@@ -101,7 +104,7 @@ class LecturersControllerTest extends TestCase
             'status' => 'Active',
         ]);
 
-        $this->actingAs(User::factory()->admin()->create())
+        $this->actingAs(User::factory()->create(['role' => 'registrar']))
             ->get(route('lecturers.index'))
             ->assertOk()
             ->assertSee('Lecturer directory')

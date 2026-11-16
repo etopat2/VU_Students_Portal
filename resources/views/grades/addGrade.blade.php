@@ -5,7 +5,7 @@
 @section('content')
 <section class="page-intro"><div><p class="eyebrow">GRADEBOOK</p><h2>Add grade</h2><p class="page-description">Record a student's assessment result.</p></div><a class="btn btn-outline-secondary" href="{{ route('grades.index') }}" data-page-link>Back to grades</a></section>
 @if ($students->isEmpty() || $courses->isEmpty())
-    <div class="alert alert-warning">Add at least one student and one course before recording a grade.</div>
+    <p class="text-secondary">Add at least one student and one course before recording a grade.</p>
 @else
     <section class="card academic-form-card"><div class="card-body">
         <form action="{{ route('grades.store') }}" method="POST">

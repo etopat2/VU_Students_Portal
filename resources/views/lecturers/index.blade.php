@@ -12,10 +12,6 @@
     <a class="btn btn-primary" href="{{ route('lecturers.create') }}" data-page-link>Add lecturer</a>
 </section>
 
-@if (session('status'))
-    <div class="alert alert-success">{{ session('status') }}</div>
-@endif
-
 <section class="row g-3 mb-4" aria-label="Lecturer summary">
     <div class="col-12 col-sm-4">
         <article class="card dashboard-stat-card h-100"><div class="card-body">
@@ -49,7 +45,7 @@
             </div>
             <label class="academic-search">
                 <span class="visually-hidden">Search lecturers</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+                <i class="fa fa-search" aria-hidden="true"></i>
                 <input class="form-control form-control-sm" type="search" placeholder="Search lecturers" data-table-filter="#lecturersTable" autocomplete="off">
             </label>
         </div>

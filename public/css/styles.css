@@ -57,7 +57,7 @@ a:hover {
     flex-direction: column;
     width: min(84vw, 300px);
     height: 100dvh;
-    overflow-y: auto;
+    overflow: hidden;
     padding: 27px 18px 20px;
     border: 0;
     background: #17243b;
@@ -96,6 +96,7 @@ a:hover {
 
 .sidebar-brand {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     gap: 12px;
     margin: 0 6px 48px;
@@ -103,16 +104,11 @@ a:hover {
 }
 
 .brand-mark {
-    display: grid;
-    width: 40px;
-    height: 40px;
-    place-items: center;
-    border-radius: 12px;
-    background: #5b7cfa;
-    box-shadow: 0 6px 16px rgb(34 68 180 / 30%);
-    color: #fff;
-    font-size: 22px;
-    font-weight: 800;
+    display: block;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    object-fit: contain;
 }
 
 .sidebar-brand > span:last-child {
@@ -150,7 +146,14 @@ a:hover {
 
 .sidebar-nav {
     display: grid;
+    min-height: 0;
+    flex: 1 1 auto;
     gap: 7px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: rgb(255 255 255 / 24%) transparent;
+    scrollbar-width: thin;
 }
 
 .sidebar-link {
@@ -196,18 +199,15 @@ a:hover {
     content: '';
 }
 
-.sidebar-link svg {
+.sidebar-link .fa {
     width: 19px;
-    height: 19px;
     flex: 0 0 19px;
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 1.7;
+    font-size: 17px;
+    text-align: center;
 }
 
 .sidebar-bottom {
+    flex: 0 0 auto;
     margin-top: auto;
     padding-top: 16px;
     border-top: 1px solid rgb(255 255 255 / 10%);
@@ -301,13 +301,8 @@ a:hover {
     color: #34425a;
 }
 
-.sidebar-toggle svg {
-    width: 21px;
-    height: 21px;
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-width: 1.8;
+.sidebar-toggle .fa {
+    font-size: 20px;
 }
 
 .page-content {
@@ -355,6 +350,19 @@ a:hover {
     margin: 0;
     color: #d4def6;
     font-size: 12px;
+}
+
+.welcome-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-live-status {
+    color: #dce5ff;
+    font-size: 10px;
+    white-space: nowrap;
 }
 
 .welcome-action {
@@ -414,6 +422,12 @@ a:hover {
     height: 30px;
 }
 
+.stat-icon .fa,
+.quick-icon .fa,
+.settings-icon .fa {
+    font-size: 15px;
+}
+
 .stat-icon-blue,
 .quick-icon-blue,
 .settings-icon-blue {
@@ -434,7 +448,8 @@ a:hover {
     color: #c48620;
 }
 
-.settings-icon-green {
+.settings-icon-green,
+.stat-icon-green {
     background: #e7f7f0;
     color: #28875a;
 }
@@ -822,17 +837,13 @@ a:hover {
     flex: 0 1 240px;
 }
 
-.academic-search svg {
+.academic-search > .fa {
     position: absolute;
     z-index: 1;
     top: 9px;
     left: 10px;
-    width: 15px;
-    height: 15px;
-    fill: none;
-    stroke: #8490a3;
-    stroke-linecap: round;
-    stroke-width: 1.7;
+    color: #8490a3;
+    font-size: 14px;
 }
 
 .academic-search .form-control {
@@ -1242,6 +1253,12 @@ a:hover {
         padding: 14px 16px;
     }
 
+    .welcome-actions {
+        align-items: flex-end;
+        flex-direction: column;
+        gap: 5px;
+    }
+
     .welcome-tag {
         margin-bottom: 3px;
         font-size: 8px;
@@ -1311,6 +1328,50 @@ a:hover {
         width: 100%;
         flex-basis: auto;
     }
+}
+
+.answer-editor {
+    overflow: hidden;
+    border: 1px solid #dce2ec;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.answer-editor:focus-within {
+    border-color: #8398e8;
+    box-shadow: 0 0 0 .2rem rgb(84 112 213 / 12%);
+}
+
+.answer-editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+    border-bottom: 1px solid #e8ecf3;
+    background: #f8f9fc;
+}
+
+.answer-editor-content {
+    min-height: 260px;
+    padding: 16px;
+    outline: none;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+.answer-editor-content:empty::before {
+    color: #8a95a8;
+    content: 'Write your answer here...';
+    pointer-events: none;
+}
+
+.answer-submitted-content {
+    padding: 16px;
+    border: 1px solid #e8ecf3;
+    border-radius: 10px;
+    background: #fff;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
 }
 
 @media (prefers-reduced-motion: reduce) {

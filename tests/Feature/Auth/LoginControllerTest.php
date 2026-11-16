@@ -51,6 +51,10 @@ class LoginControllerTest extends TestCase
             ->assertRedirect(route('login'))
             ->assertSessionHasErrors(['email' => 'The email or password is incorrect.']);
 
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('The email or password is incorrect.');
+
         $this->assertGuest();
     }
 

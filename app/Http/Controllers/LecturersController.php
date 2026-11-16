@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lecturer;
+use App\Models\Department;
+use Devrabiul\ToastMagic\Facades\ToastMagic;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,6 +32,7 @@ class LecturersController extends Controller
     {
         return $this->respond($request, 'lecturers.createLecturer', [
             'lecturer' => null,
+            'departments' => Department::query()->orderBy('name')->get(['id', 'name']),
         ], 'Add lecturer');
     }
 
@@ -37,32 +40,35 @@ class LecturersController extends Controller
     {
         Lecturer::create($this->validatedLecturer($request));
 
-        return redirect()
-            ->route('lecturers.index')
-            ->with('status', 'Lecturer added successfully.');
+        ToastMagic::success('Lecturer added successfully.');
+
+        return redirect()->route('lecturers.index');
     }
 
     public function edit(Request $request, Lecturer $lecturer): View|Response
     {
-        return $this->respond($request, 'lecturers.editLecturer', compact('lecturer'), 'Edit lecturer');
+        return $this->respond($request, 'lecturers.editLecturer', [
+            'lecturer' => $lecturer,
+            'departments' => Department::query()->orderBy('name')->get(['id', 'name']),
+        ], 'Edit lecturer');
     }
 
     public function update(Request $request, Lecturer $lecturer): RedirectResponse
     {
         $lecturer->update($this->validatedLecturer($request, $lecturer));
 
-        return redirect()
-            ->route('lecturers.index')
-            ->with('status', 'Lecturer updated successfully.');
+        ToastMagic::success('Lecturer updated successfully.');
+
+        return redirect()->route('lecturers.index');
     }
 
     public function destroy(Lecturer $lecturer): RedirectResponse
     {
         $lecturer->delete();
 
-        return redirect()
-            ->route('lecturers.index')
-            ->with('status', 'Lecturer removed successfully.');
+        ToastMagic::success('Lecturer removed successfully.');
+
+        return redirect()->route('lecturers.index');
     }
 
     private function validatedLecturer(Request $request, ?Lecturer $lecturer = null): array
@@ -85,6 +91,7 @@ class LecturersController extends Controller
             'qualification' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'status' => ['required', Rule::in(['Active', 'On leave'])],
+            'department_id' => ['nullable', 'integer', 'exists:departments,id'],
         ]);
     }
 

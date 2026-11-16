@@ -1,6 +1,6 @@
 <div class="topbar">
     <button class="sidebar-toggle btn btn-outline-secondary d-lg-none" type="button" aria-controls="appSidebar" aria-expanded="false" aria-label="Open navigation">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
     <div class="topbar-heading">
         <p class="eyebrow">VU STUDENT PORTAL</p>

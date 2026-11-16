@@ -57,7 +57,12 @@ class AccountControllerTest extends TestCase
                 'role' => 'admin',
             ])
             ->assertRedirect(route('settings'))
-            ->assertSessionHas('status', 'Your account details have been updated.');
+                ->assertSessionHas('laravel-toaster-magic::messages', fn (array $messages): bool => $messages[0]['type'] === 'success'
+                    && $messages[0]['message'] === 'Your account details have been updated.');
+
+            $this->get(route('settings'))
+                ->assertOk()
+                ->assertSee('Your account details have been updated.');
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,

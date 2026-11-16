@@ -15,17 +15,21 @@ class GradesControllerTest extends TestCase
 
     public function test_grade_can_be_created_with_valid_academic_records(): void
     {
-        $this->actingAs(User::factory()->admin()->create());
+        $this->actingAs(User::factory()->create(['role' => 'registrar']));
         [$student, $course] = $this->createAcademicRecords();
 
-        $this->post(route('grades.store'), [
+        $response = $this->post(route('grades.store'), [
             'student_id' => $student->id,
             'course_id' => $course->id,
             'assessment' => 'Coursework',
             'score' => 88.5,
             'letter_grade' => 'A',
             'term' => 'Semester 1 · 2026',
-        ])->assertRedirect(route('grades.index'));
+        ]);
+
+        $response->assertRedirect(route('grades.index'));
+        $response->assertSessionHas('laravel-toaster-magic::messages', fn (array $messages): bool => $messages[0]['type'] === 'success'
+            && $messages[0]['message'] === 'Grade added successfully.');
 
         $this->assertDatabaseHas('grades', [
             'student_id' => $student->id,
@@ -38,7 +42,7 @@ class GradesControllerTest extends TestCase
 
     public function test_grade_updates_and_deletes_through_resource_routes(): void
     {
-        $this->actingAs(User::factory()->admin()->create());
+        $this->actingAs(User::factory()->create(['role' => 'registrar']));
         [$student, $course] = $this->createAcademicRecords();
         $grade = Grade::create([
             'student_id' => $student->id,
@@ -72,7 +76,7 @@ class GradesControllerTest extends TestCase
 
     public function test_grade_rejects_scores_outside_the_valid_range(): void
     {
-        $this->actingAs(User::factory()->admin()->create());
+        $this->actingAs(User::factory()->create(['role' => 'registrar']));
         [$student, $course] = $this->createAcademicRecords();
 
         $this->from(route('grades.create'))
@@ -92,7 +96,7 @@ class GradesControllerTest extends TestCase
 
     public function test_add_and_edit_forms_render_with_academic_record_options(): void
     {
-        $this->actingAs(User::factory()->admin()->create());
+        $this->actingAs(User::factory()->create(['role' => 'registrar']));
         [$student, $course] = $this->createAcademicRecords();
         $grade = Grade::create([
             'student_id' => $student->id,

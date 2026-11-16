@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Devrabiul\ToastMagic\Facades\ToastMagic;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class LoginController extends Controller
     {
         return view('auth.login');
     }
-
+    
     public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
@@ -30,27 +31,32 @@ class LoginController extends Controller
         );
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $message = 'Too many sign-in attempts. Try again in '.RateLimiter::availableIn($throttleKey).' seconds.';
+            ToastMagic::error($message);
+
             return back()
-                ->withErrors([
-                    'email' => 'Too many sign-in attempts. Try again in '.RateLimiter::availableIn($throttleKey).' seconds.',
-                ])
+                ->withErrors(['email' => $message])
                 ->onlyInput('email');
         }
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             RateLimiter::hit($throttleKey, 60);
+            $message = 'The email or password is incorrect.';
+            ToastMagic::error($message);
 
             return back()
-                ->withErrors(['email' => 'The email or password is incorrect.'])
+                ->withErrors(['email' => $message])
                 ->onlyInput('email');
         }
 
-        if (! in_array($request->user()->role, ['admin', 'student'], true)) {
+        if (! $request->user()->hasAnyRole(['admin', 'registrar', 'accountant', 'lecturer', 'student'])) {
             Auth::logout();
             RateLimiter::hit($throttleKey, 60);
+            $message = 'This account does not have portal access.';
+            ToastMagic::error($message);
 
             return back()
-                ->withErrors(['email' => 'This account does not have portal access.'])
+                ->withErrors(['email' => $message])
                 ->onlyInput('email');
         }
 

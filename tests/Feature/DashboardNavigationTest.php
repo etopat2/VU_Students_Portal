@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Course;
+use App\Models\AuditLog;
+use App\Models\Faculty;
 use App\Models\Grade;
+use App\Models\Institution;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,8 +53,23 @@ class DashboardNavigationTest extends TestCase
         }
     }
 
-    public function test_admin_dashboard_uses_live_academic_summary_data(): void
+    public function test_admin_dashboard_shows_system_metrics_and_recent_audit_activity(): void
     {
+        $admin = User::factory()->admin()->create();
+        User::factory()->create(['role' => 'registrar']);
+        $institution = Institution::create(['name' => 'Example University', 'code' => 'EXU']);
+        Faculty::create([
+            'institution_id' => $institution->id,
+            'name' => 'Science',
+            'code' => 'SCI',
+        ]);
+        AuditLog::create([
+            'user_id' => $admin->id,
+            'action' => 'institution.updated',
+            'subject_type' => Institution::class,
+            'subject_id' => $institution->id,
+            'created_at' => now(),
+        ]);
         $student = Student::create([
             'student_number' => 'VU-2026-001',
             'name' => 'Alex Morgan',
@@ -77,14 +95,16 @@ class DashboardNavigationTest extends TestCase
             'term' => 'Semester 1',
         ]);
 
-        $this->actingAs(User::factory()->admin()->create())
+        $this->actingAs($admin)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('ADMINISTRATOR OVERVIEW')
-            ->assertSee('1 active student')
-            ->assertSee('Grade distribution')
-            ->assertSee('Recent results')
-            ->assertDontSee('Attendance');
+            ->assertSee('SYSTEM ADMINISTRATOR OVERVIEW')
+            ->assertSee('User accounts')
+            ->assertSee('Faculties')
+            ->assertSee('Recent system activity')
+            ->assertSee('institution.updated')
+            ->assertDontSee('Grade distribution')
+            ->assertDontSee('Alex Morgan');
     }
 
     public function test_student_dashboard_uses_only_the_linked_student_summary(): void
@@ -125,6 +145,15 @@ class DashboardNavigationTest extends TestCase
             ->assertSee('Enrolled courses')
             ->assertSee('84.0')
             ->assertDontSee('Administration');
+    }
+
+    public function test_student_sidebar_links_to_assessment_handoff(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'student']))
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee(route('student-assessments.index'))
+            ->assertSee('Tests &amp; examinations', false);
     }
 
     public function test_dashboard_escapes_the_authenticated_users_name(): void

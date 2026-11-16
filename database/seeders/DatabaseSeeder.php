@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(StarterAcademicDataSeeder::class);
+
         $admin = config('portal.demo_accounts.admin');
         $studentAccount = config('portal.demo_accounts.student');
 
@@ -70,5 +72,7 @@ class DatabaseSeeder extends Seeder
         if (! $student->courses()->exists()) {
             $student->courses()->syncWithoutDetaching(Course::query()->pluck('courses.id'));
         }
+
+        $this->call(GenerateMissingUserAccountsSeeder::class);
     }
 }

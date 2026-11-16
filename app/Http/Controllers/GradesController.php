@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Grade;
 use App\Models\Student;
+use Devrabiul\ToastMagic\Facades\ToastMagic;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,9 +42,9 @@ class GradesController extends Controller
     {
         Grade::create($this->validatedGrade($request));
 
-        return redirect()
-            ->route('grades.index')
-            ->with('status', 'Grade added successfully.');
+        ToastMagic::success('Grade added successfully.');
+
+        return redirect()->route('grades.index');
     }
 
     public function edit(Request $request, Grade $grade): View|Response
@@ -55,18 +56,18 @@ class GradesController extends Controller
     {
         $grade->update($this->validatedGrade($request, $grade));
 
-        return redirect()
-            ->route('grades.index')
-            ->with('status', 'Grade updated successfully.');
+        ToastMagic::success('Grade updated successfully.');
+
+        return redirect()->route('grades.index');
     }
 
     public function destroy(Grade $grade): RedirectResponse
     {
         $grade->delete();
 
-        return redirect()
-            ->route('grades.index')
-            ->with('status', 'Grade deleted successfully.');
+        ToastMagic::success('Grade deleted successfully.');
+
+        return redirect()->route('grades.index');
     }
 
     private function validatedGrade(Request $request, ?Grade $grade = null): array

@@ -12,10 +12,6 @@
     <a class="btn btn-outline-secondary" href="{{ route('profile') }}" data-page-link>View profile</a>
 </section>
 
-@if (session('status'))
-    <div class="alert alert-success" role="status">{{ session('status') }}</div>
-@endif
-
 <div class="row g-3">
     <div class="col-12 col-xl-8">
         <article class="card detail-card">
@@ -34,34 +30,36 @@
                     <div class="mb-3">
                         <label class="form-label" for="name">Full name</label>
                         <input class="form-control @error('name') is-invalid @enderror" id="name" name="name" type="text" value="{{ old('name', $user->name) }}" autocomplete="name" required>
-                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label" for="email">Email address</label>
                         <input class="form-control @error('email') is-invalid @enderror" id="email" name="email" type="email" value="{{ old('email', $user->email) }}" autocomplete="email" required>
-                        @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <hr class="my-4">
                     <h4 class="h6 mb-1">Change password</h4>
-                    <p class="text-secondary small mb-3">Leave these fields blank to keep your current password.</p>
+                    <p class="text-secondary small mb-3">
+                        @if ($user->must_change_password)
+                            A password change is required before you can use the rest of the portal.
+                        @else
+                            Leave these fields blank to keep your current password.
+                        @endif
+                    </p>
 
                     <div class="mb-3">
                         <label class="form-label" for="current_password">Current password</label>
-                        <input class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" type="password" autocomplete="current-password">
-                        @error('current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <input class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" type="password" autocomplete="current-password" @required($user->must_change_password)>
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="password">New password</label>
-                            <input class="form-control @error('password') is-invalid @enderror" id="password" name="password" type="password" autocomplete="new-password">
-                            @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <input class="form-control @error('password') is-invalid @enderror" id="password" name="password" type="password" autocomplete="new-password" @required($user->must_change_password)>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="password_confirmation">Confirm new password</label>
-                            <input class="form-control" id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password">
+                            <input class="form-control" id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" @required($user->must_change_password)>
                         </div>
                     </div>
 
@@ -77,7 +75,7 @@
     <div class="col-12 col-xl-4">
         <article class="card settings-card h-100">
             <div class="card-body">
-                <span class="settings-icon settings-icon-amber" aria-hidden="true">S</span>
+                <span class="settings-icon settings-icon-amber" aria-hidden="true"><i class="fa fa-shield"></i></span>
                 <h3>Security and access</h3>
                 <p>Sign out when using a shared device. Your role and permissions are managed by the portal administrator.</p>
                 <form action="{{ route('logout') }}" method="POST">
